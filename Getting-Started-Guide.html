@@ -438,10 +438,11 @@ terraform validate   <span class="cmt"># catches syntax/reference errors</span><
     <p>Terraform shows the plan again and asks for confirmation — type <code>yes</code>. After 2–3 minutes you'll see the <strong>outputs</strong>:</p>
 <pre><code>Outputs:
 
-bucket_name        = "tf-learning-bucket-a1b2c3d4"
+bucket_name        = "tf-learning-data-a1b2c3d4"
 instance_public_ip = "3.85.x.x"
 website_url        = "http://3.85.x.x"
-ssh_command        = "ssh -i tf-learning-key.pem ec2-user@3.85.x.x"</code></pre>
+ssh_command        = "No key pair configured - set key_pair_name in terraform.tfvars to enable SSH (see README)."</code></pre>
+    <p style="margin-top:10px;"><em>Note: <code>ssh_command</code> only shows a real SSH command once you've set <code>key_pair_name</code> — see <a href="#ssh">section 8</a>. Until then it prints the reminder above, which is expected.</em></p>
   </div>
 </div>
 
@@ -515,7 +516,7 @@ ssh_command        = "ssh -i tf-learning-key.pem ec2-user@3.85.x.x"</code></pre>
 <p class="h-sub">The best lesson in this project: the server can use S3 with <strong>no stored credentials at all</strong>.</p>
 
 <div class="card step">
-  <div class="snum">7.1</div>
+  <div class="snum">8.1</div>
   <div class="sbody">
     <h3>Create a key pair (PowerShell)</h3>
 <pre><code>aws ec2 create-key-pair --key-name tf-learning-key --query 'KeyMaterial' --output text | Out-File -Encoding ascii tf-learning-key.pem</code></pre>
@@ -530,7 +531,7 @@ ssh_command        = "ssh -i tf-learning-key.pem ec2-user@3.85.x.x"</code></pre>
 </div>
 
 <div class="card step">
-  <div class="snum">7.2</div>
+  <div class="snum">8.2</div>
   <div class="sbody">
     <h3>SSH in</h3>
     <p>Windows 10/11 includes OpenSSH — no extra install needed:</p>
@@ -539,7 +540,7 @@ ssh_command        = "ssh -i tf-learning-key.pem ec2-user@3.85.x.x"</code></pre>
 </div>
 
 <div class="card step">
-  <div class="snum">7.3</div>
+  <div class="snum">8.3</div>
   <div class="sbody">
     <h3>Test S3 access from the instance (you're now in a Linux shell)</h3>
     <p>The bucket name is shown on the hello page, or run <code>terraform output bucket_name</code> on your PC.</p>
