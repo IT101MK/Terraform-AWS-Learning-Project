@@ -7,6 +7,13 @@ connecting them.
 **Licence:** [MIT](LICENSE.md) — free to use, modify, and distribute, including
 commercially. Provided as-is, without warranty.
 
+> **A prettier, step-by-step version of this guide** is in
+> [`Getting-Started-Guide.html`](Getting-Started-Guide.html) — GitHub shows
+> HTML files as raw source rather than rendering them, so **download the file
+> and open it in your browser** (or clone the repo and open it locally) to
+> see it properly formatted. This README covers the same steps in plain
+> Markdown if you'd rather stay on GitHub.
+
 > ### ⚠️ This creates real, billable AWS resources
 >
 > Running `terraform apply` creates an actual EC2 instance, VPC, and S3

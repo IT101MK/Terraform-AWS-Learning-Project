@@ -1,0 +1,6 @@
+# Normalize line endings for everyone, regardless of OS or git config.
+* text=auto eol=lf
+
+# Binary files - never touch line endings.
+*.png binary
+*.pem binary
