@@ -150,6 +150,11 @@
   </div>
 </header>
 
+<div class="callout danger">
+  <strong>&#9888; This creates real, billable AWS resources.</strong>
+  Running <code>terraform apply</code> builds an actual EC2 instance, VPC, and S3 bucket in <strong>your own AWS account</strong> &mdash; this guide and its author have no visibility into, or control over, your account or your bill. Free Tier accounts typically pay £0 if destroyed promptly, but eligibility, limits, and pricing vary by account, region, and time. <strong>You are solely responsible for monitoring your AWS costs and destroying resources you don't need</strong> (see <a href="#destroy">Destroy when done</a>). Provided as-is under the <a href="https://github.com/IT101MK/Terraform-AWS-Learning-Project/blob/master/LICENSE.md">MIT licence</a> &mdash; no warranty, and no liability for any AWS charges you incur. Set up a billing alert before you run <code>terraform apply</code>.
+</div>
+
 <nav class="card">
   <strong>Contents</strong>
   <ol class="toc">
@@ -562,6 +567,7 @@ aws s3 ls                                             <span class="cmt"># FAILS:
       <li>Free Tier covers 750 hours/month of an eligible micro instance type (e.g. t3.micro) for the first 12 months — but only on eligible accounts, and it expires. A forgotten micro instance after that is roughly <strong>£6–7/month (approx.)</strong>.</li>
       <li>Rebuilding is one <code>terraform apply</code> away — that's the whole point of IaC. Destroying costs you nothing but a coffee break.</li>
       <li>You did set up that budget alert in section 3, right?</li>
+      <li><strong>This is your AWS bill, your responsibility</strong> — only you can stop charges accruing on your account.</li>
     </ul>
   </div>
   <p>If you created the SSH key pair, it lives <em>outside</em> Terraform — delete it separately when you're fully done:</p>

@@ -7,6 +7,27 @@ connecting them.
 **Licence:** [MIT](LICENSE.md) — free to use, modify, and distribute, including
 commercially. Provided as-is, without warranty.
 
+> ### ⚠️ This creates real, billable AWS resources
+>
+> Running `terraform apply` creates an actual EC2 instance, VPC, and S3
+> bucket in **your own AWS account**. AWS bills **you** for whatever you
+> leave running — this project and its author have no visibility into, or
+> control over, your account or your bill. Typical Free Tier accounts pay
+> £0 if destroyed promptly, but:
+>
+> - **You are solely responsible for monitoring your AWS costs and
+>   destroying resources you don't need** (see [Destroy when you're
+>   done](#important-destroy-when-youre-done)).
+> - Free Tier eligibility, limits, and pricing vary by account, region, and
+>   time, and are entirely outside this project's control.
+> - Leaving resources running, misconfiguring `instance_type`, or exceeding
+>   Free Tier limits can and will incur real charges from AWS.
+>
+> This software is provided **as-is, with no warranty**, under the [MIT
+> licence](LICENSE.md) — the author accepts no liability for any AWS
+> charges, data loss, or other costs you incur using it. Set up a billing
+> alert (see below) before you run `terraform apply`.
+
 ## What is Terraform / Infrastructure as Code?
 
 Infrastructure as Code (IaC) means describing your cloud resources — servers,
@@ -206,6 +227,9 @@ reason to keep things running. Why it matters:
   Five minutes of setup, permanent peace of mind.
 - Rebuilding is one `terraform apply` away — that's the whole point of IaC.
   Destroying costs you nothing but a coffee break.
+- **This is your AWS bill, your responsibility.** Neither Terraform nor this
+  project's author can see or stop charges accruing on your account — only
+  you (via `terraform destroy` and/or a billing alert) can.
 
 If you created the key pair, it lives outside Terraform, so delete it
 separately when you're fully done:
