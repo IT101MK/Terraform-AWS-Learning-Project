@@ -1,6 +1,5 @@
-# Required Notice: Copyright (c) 2026 IT101MK (https://github.com/IT101MK)
-# Licensed under PolyForm Noncommercial 1.0.0 - see LICENSE.md.
-# Commercial use requires a separate commercial licence from the copyright holder.
+# Copyright (c) 2026 IT101MK (https://github.com/IT101MK)
+# Licensed under the MIT License - see LICENSE.md.
 
 # providers.tf
 #

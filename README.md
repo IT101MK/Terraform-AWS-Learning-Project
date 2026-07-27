@@ -4,10 +4,8 @@ A small, complete, real AWS environment you build with one command: a VPC, a
 web server running nginx, a private S3 bucket, and the IAM permissions
 connecting them.
 
-**Licence:** free for **noncommercial** use under
-[PolyForm Noncommercial 1.0.0](LICENSE.md). **Commercial use requires a
-commercial licence**, contact me via my GitHub profile. Provided as-is,
-without warranty.
+**Licence:** [MIT](LICENSE.md) — free to use, modify, and distribute, including
+commercially. Provided as-is, without warranty.
 
 ## What is Terraform / Infrastructure as Code?
 
