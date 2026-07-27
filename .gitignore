@@ -1,0 +1,36 @@
+# Terraform state files - contain EVERYTHING about your infrastructure,
+# often including sensitive values. Never commit these.
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# The .terraform directory holds downloaded provider binaries and other
+# working files. It's large and machine-specific - always regenerate it
+# with "terraform init".
+.terraform/
+
+# Your personal variable values (home IP, key names). The .example file
+# IS committed; your real tfvars is not. The second pattern un-ignores
+# the example template.
+*.tfvars
+*.tfvars.json
+!terraform.tfvars.example
+
+# Private keys - never, ever commit these.
+*.pem
+*.ppk
+
+# Terraform crash logs and plan files
+crash.log
+crash.*.log
+*.tfplan
+
+# CLI config overrides
+.terraformrc
+terraform.rc
+
+# Raw terminal session logs - working notes used to write the guide's
+# troubleshooting section. Contains real AWS account IDs and IP addresses
+# from actual sessions; the polished, redacted content already lives in
+# README.md and Getting-Started-Guide.html.
+Guide/

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terraform + AWS — Getting Started Guide</title>
+<style>
+  :root {
+    --ink: #1a2332;
+    --muted: #5b6b7f;
+    --line: #dde4ec;
+    --bg: #f6f8fb;
+    --card: #ffffff;
+    --accent: #6b46c1;      /* terraform purple */
+    --accent-soft: #ede9fe;
+    --aws: #d97706;         /* aws orange */
+    --aws-soft: #fef3e2;
+    --ok: #15803d;
+    --ok-soft: #e8f5ec;
+    --warn: #b45309;
+    --warn-soft: #fef6e7;
+    --danger: #b91c1c;
+    --danger-soft: #fdecec;
+    --code-bg: #1e2430;
+    --code-ink: #d8e0ec;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    color: var(--ink); background: var(--bg);
+    line-height: 1.6; font-size: 16px;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  header.hero {
+    background: linear-gradient(135deg, #2d1b69 0%, #6b46c1 60%, #8b5cf6 100%);
+    color: #fff; border-radius: 14px; padding: 36px 32px; margin-bottom: 28px;
+  }
+  header.hero h1 { margin: 0 0 8px; font-size: 1.9rem; letter-spacing: -0.02em; }
+  header.hero p { margin: 0; opacity: 0.9; max-width: 46em; }
+  .hero-badges { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 999px; padding: 3px 12px; font-size: 0.8rem;
+  }
+
+  h2 {
+    font-size: 1.35rem; margin: 44px 0 6px; letter-spacing: -0.01em;
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2 .hnum {
+    background: var(--accent); color: #fff; border-radius: 8px;
+    width: 32px; height: 32px; display: inline-flex; align-items: center;
+    justify-content: center; font-size: 1rem; flex: 0 0 auto;
+  }
+  .h-sub { color: var(--muted); margin: 0 0 18px 42px; font-size: 0.95rem; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 20px 24px; margin: 14px 0;
+  }
+
+  /* step cards */
+  .step { display: flex; gap: 16px; }
+  .step .snum {
+    flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent); font-weight: 700;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .step .sbody { flex: 1; min-width: 0; }
+  .step h3 { margin: 4px 0 6px; font-size: 1.05rem; }
+  .step p { margin: 6px 0; }
+
+  pre {
+    background: var(--code-bg); color: var(--code-ink);
+    border-radius: 8px; padding: 12px 16px; overflow-x: auto;
+    font-size: 0.85rem; line-height: 1.55; margin: 10px 0;
+  }
+  code { font-family: Consolas, "Cascadia Code", monospace; }
+  p code, li code, td code {
+    background: var(--accent-soft); color: var(--accent);
+    padding: 1px 6px; border-radius: 5px; font-size: 0.85em;
+  }
+  pre .cmt { color: #7b8aa0; }
+  pre .hl { color: #a5f3c4; }
+
+  .callout {
+    border-radius: 10px; padding: 14px 18px; margin: 14px 0;
+    border-left: 4px solid; font-size: 0.95rem;
+  }
+  .callout strong:first-child { display: block; margin-bottom: 4px; }
+  .callout.info  { background: var(--accent-soft); border-color: var(--accent); }
+  .callout.tip   { background: var(--ok-soft); border-color: var(--ok); }
+  .callout.warn  { background: var(--warn-soft); border-color: var(--warn); }
+  .callout.danger{ background: var(--danger-soft); border-color: var(--danger); }
+
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.92rem; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--bg); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  .tablewrap { overflow-x: auto; }
+
+  .checklist { list-style: none; padding: 0; margin: 0; }
+  .checklist li {
+    padding: 10px 0 10px 36px; position: relative; border-bottom: 1px dashed var(--line);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: ""; position: absolute; left: 6px; top: 17px;
+    width: 8px; height: 8px; border-radius: 2px;
+    background: var(--accent);
+  }
+
+  figure { margin: 18px 0; text-align: center; }
+  figure svg { max-width: 100%; height: auto; }
+  figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
+
+  .toc { columns: 2; column-gap: 32px; padding-left: 20px; margin: 8px 0; }
+  .toc li { margin: 4px 0; break-inside: avoid; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  a { color: var(--accent); }
+
+  footer { margin-top: 48px; text-align: center; color: var(--muted); font-size: 0.85rem; }
+
+  @media (max-width: 640px) {
+    .toc { columns: 1; }
+    header.hero { padding: 26px 20px; }
+    .card { padding: 16px; }
+  }
+  @media print {
+    body { background: #fff; font-size: 12px; }
+    .wrap { max-width: none; padding: 0; }
+    .card, .callout, .step, figure, pre { break-inside: avoid; }
+    header.hero { border-radius: 0; }
+    a { color: inherit; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>Terraform + AWS — Getting Started Guide</h1>
+  <p>Your complete walkthrough for building (and safely destroying) your first real AWS environment with Infrastructure as Code. Follow it top to bottom — every command is copy-paste ready for PowerShell.</p>
+  <div class="hero-badges">
+    <span class="badge">Project-IaC</span>
+    <span class="badge">Free-tier friendly</span>
+    <span class="badge">~60–90 min first time</span>
+  </div>
+</header>
+
+<nav class="card">
+  <strong>Contents</strong>
+  <ol class="toc">
+    <li><a href="#what">What you're building</a></li>
+    <li><a href="#arch">Architecture diagram</a></li>
+    <li><a href="#prereq">Prerequisites (one-time setup)</a></li>
+    <li><a href="#workflow">The Terraform workflow</a></li>
+    <li><a href="#build">Build it, step by step</a></li>
+    <li><a href="#verify">Verify it worked</a></li>
+    <li><a href="#troubleshooting">Troubleshooting &amp; lessons learned</a></li>
+    <li><a href="#ssh">Optional: SSH in &amp; test IAM/S3</a></li>
+    <li><a href="#destroy">Destroy when done (important!)</a></li>
+    <li><a href="#files">What each file does</a></li>
+    <li><a href="#next">What to learn next</a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="what"><span class="hnum">1</span> What you're building</h2>
+<p class="h-sub">A small but <em>real</em> AWS environment — the same building blocks used in production, minus the complexity.</p>
+
+<div class="card">
+  <p><strong>Infrastructure as Code (IaC)</strong> means describing cloud resources — servers, networks, storage — in text files instead of clicking around a web console. <strong>Terraform</strong> reads those files, compares them to what actually exists in AWS, and creates/updates/deletes resources to match. Your infrastructure becomes <em>repeatable</em>, <em>reviewable</em> (it's just code), and <em>disposable</em> — destroy everything and rebuild it identically in minutes.</p>
+
+  <div class="tablewrap">
+  <table>
+    <tr><th>Resource</th><th>What it's for</th></tr>
+    <tr><td>VPC <code>10.0.0.0/16</code></td><td>Your own isolated network inside AWS</td></tr>
+    <tr><td>Public subnet <code>10.0.1.0/24</code></td><td>The slice of the network where the server lives</td></tr>
+    <tr><td>Internet Gateway + route table</td><td>Connects the subnet to the internet (this is what makes it "public")</td></tr>
+    <tr><td>Security group</td><td>Firewall: HTTP (80) from anywhere, SSH (22) from <em>your IP only</em></td></tr>
+    <tr><td>EC2 instance (t3.micro)</td><td>Amazon Linux 2023 server that installs nginx and serves a hello page</td></tr>
+    <tr><td>IAM role + instance profile</td><td>Lets the server access ONE S3 bucket — no passwords or keys stored anywhere</td></tr>
+    <tr><td>Private S3 bucket</td><td>Object storage the server can read/write (random name suffix — bucket names are global)</td></tr>
+  </table>
+  </div>
+
+  <div class="callout tip">
+    <strong>Tip: cost is £0 if you stay in the Free Tier and destroy when done.</strong>
+    t3.micro is free for 750 hrs/month during your account's first 12 months. There is deliberately <em>no NAT Gateway or load balancer</em> in this project — those are the classic "surprise bill" traps for learners.
+  </div>
+  <div class="callout info">
+    <strong>Note: free-tier eligible instance types vary by account and region.</strong>
+    Don't assume <code>t2.micro</code> — plenty of guides still do, but many accounts today are only eligible for <code>t3.micro</code> or <code>t4g.micro</code>. Check what your account actually qualifies for before setting <code>instance_type</code>:
+<pre style="margin-top:8px"><code>aws ec2 describe-instance-types --region us-east-1 --filters "Name=free-tier-eligible,Values=true" --query "InstanceTypes[].InstanceType" --output table</code></pre>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="arch"><span class="hnum">2</span> Architecture diagram</h2>
+<p class="h-sub">This is the picture to hold in your head. Every box below maps to a resource in a <code>.tf</code> file.</p>
+
+<div class="card">
+<figure>
+<svg viewBox="0 0 820 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AWS architecture: user connects through internet gateway into VPC public subnet to EC2 instance, which uses an IAM role to access a private S3 bucket">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5b6b7f"/>
+    </marker>
+    <marker id="arrowP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b46c1"/>
+    </marker>
+  </defs>
+
+  <!-- You -->
+  <rect x="20" y="150" width="120" height="110" rx="10" fill="#eef2f7" stroke="#5b6b7f" stroke-width="1.5"/>
+  <text x="80" y="185" text-anchor="middle" font-size="30">🧑‍💻</text>
+  <text x="80" y="215" text-anchor="middle" font-size="14" font-weight="600" fill="#1a2332">You</text>
+  <text x="80" y="235" text-anchor="middle" font-size="11" fill="#5b6b7f">browser + SSH</text>
+
+  <!-- AWS Cloud -->
+  <rect x="185" y="20" width="615" height="430" rx="14" fill="#fffdf8" stroke="#d97706" stroke-width="2"/>
+  <text x="205" y="48" font-size="14" font-weight="700" fill="#d97706">☁️ AWS Cloud — region us-east-1</text>
+
+  <!-- VPC -->
+  <rect x="205" y="65" width="390" height="360" rx="12" fill="#f5f2fc" stroke="#6b46c1" stroke-width="2"/>
+  <text x="222" y="92" font-size="13" font-weight="700" fill="#6b46c1">VPC 10.0.0.0/16</text>
+  <text x="222" y="110" font-size="11" fill="#5b6b7f">network.tf</text>
+
+  <!-- IGW on VPC edge -->
+  <rect x="170" y="175" width="70" height="60" rx="8" fill="#fff" stroke="#d97706" stroke-width="2"/>
+  <text x="205" y="200" text-anchor="middle" font-size="18">🚪</text>
+  <text x="205" y="222" text-anchor="middle" font-size="10" font-weight="600" fill="#1a2332">Internet</text>
+  <text x="205" y="233" text-anchor="middle" font-size="10" font-weight="600" fill="#1a2332">Gateway</text>
+
+  <!-- Public subnet -->
+  <rect x="265" y="125" width="305" height="270" rx="10" fill="#eafaf0" stroke="#15803d" stroke-width="1.8" stroke-dasharray="6 4"/>
+  <text x="282" y="150" font-size="12" font-weight="700" fill="#15803d">Public subnet 10.0.1.0/24</text>
+  <text x="282" y="166" font-size="10" fill="#5b6b7f">route table: 0.0.0.0/0 → IGW</text>
+
+  <!-- Security group ring -->
+  <rect x="300" y="185" width="235" height="185" rx="10" fill="none" stroke="#b91c1c" stroke-width="1.5" stroke-dasharray="3 4"/>
+  <text x="315" y="205" font-size="10" font-weight="600" fill="#b91c1c">🛡️ security group</text>
+  <text x="315" y="218" font-size="9" fill="#b91c1c">HTTP 80: anywhere · SSH 22: your IP only</text>
+
+  <!-- EC2 -->
+  <rect x="330" y="235" width="175" height="110" rx="10" fill="#fff" stroke="#d97706" stroke-width="2"/>
+  <text x="417" y="272" text-anchor="middle" font-size="26">🖥️</text>
+  <text x="417" y="298" text-anchor="middle" font-size="13" font-weight="700" fill="#1a2332">EC2 t3.micro</text>
+  <text x="417" y="315" text-anchor="middle" font-size="11" fill="#5b6b7f">Amazon Linux 2023 + nginx</text>
+  <text x="417" y="330" text-anchor="middle" font-size="10" fill="#5b6b7f">compute.tf · user_data.sh.tpl</text>
+
+  <!-- S3 -->
+  <rect x="645" y="200" width="135" height="115" rx="10" fill="#fff" stroke="#15803d" stroke-width="2"/>
+  <text x="712" y="240" text-anchor="middle" font-size="26">🪣</text>
+  <text x="712" y="268" text-anchor="middle" font-size="13" font-weight="700" fill="#1a2332">S3 bucket</text>
+  <text x="712" y="285" text-anchor="middle" font-size="10" fill="#5b6b7f">private · storage.tf</text>
+  <text x="712" y="299" text-anchor="middle" font-size="10" fill="#5b6b7f">random name suffix</text>
+
+  <!-- Arrows: you -> IGW -->
+  <line x1="140" y1="190" x2="168" y2="195" stroke="#5b6b7f" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="152" y="178" text-anchor="middle" font-size="10" fill="#5b6b7f">:80 / :22</text>
+
+  <!-- IGW -> EC2 -->
+  <line x1="240" y1="205" x2="328" y2="270" stroke="#5b6b7f" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- EC2 -> S3 via IAM role -->
+  <line x1="505" y1="285" x2="643" y2="258" stroke="#6b46c1" stroke-width="2.2" marker-end="url(#arrowP)"/>
+  <rect x="518" y="228" width="112" height="34" rx="8" fill="#ede9fe" stroke="#6b46c1" stroke-width="1.2"/>
+  <text x="574" y="243" text-anchor="middle" font-size="10" font-weight="700" fill="#6b46c1">🔑 IAM role (iam.tf)</text>
+  <text x="574" y="256" text-anchor="middle" font-size="9" fill="#6b46c1">this bucket only — no keys</text>
+</svg>
+<figcaption>The request path: your browser → Internet Gateway → public subnet → EC2 (through the security group). The EC2 instance reaches S3 using its IAM role — no credentials stored on the server.</figcaption>
+</figure>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="prereq"><span class="hnum">3</span> Prerequisites — one-time setup</h2>
+<p class="h-sub">Do these once, in order. Tick each box before moving to section 5.</p>
+
+<div class="card">
+  <ul class="checklist">
+    <li><strong>Create an AWS account</strong> — <a href="https://aws.amazon.com/free">aws.amazon.com/free</a>. Enable MFA on the root account, then stop using root for daily work.</li>
+    <li><strong>Set up a budget alert first</strong> (5 minutes, permanent peace of mind): AWS console → Billing → <strong>Budgets</strong> → Create budget → <em>Zero spend budget</em> (or £4/month, approx.) with an email alert.</li>
+    <li><strong>Create an IAM user for Terraform</strong>: console → IAM → Users → Create user → attach <code>AdministratorAccess</code> (fine for a personal learning account) → create an <strong>access key</strong> (choose "Command Line Interface"). Save the Access Key ID + Secret. <strong>Enable MFA on this user too</strong> — an admin user with leaked keys and no MFA is the classic account-takeover story, and you know this drill from Entra.</li>
+    <li><strong>Install &amp; configure the AWS CLI</strong> (see commands below).</li>
+    <li><strong>Install Terraform</strong> (see commands below).</li>
+    <li><strong>Find your public IP</strong> — open <a href="https://checkip.amazonaws.com">checkip.amazonaws.com</a> and note it down. You'll need it in step 5.1.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Install commands (PowerShell)</h3>
+<pre><code><span class="cmt"># --- AWS CLI ---</span>
+winget install Amazon.AWSCLI
+<span class="cmt"># restart your terminal, then:</span>
+aws configure
+<span class="cmt"># paste Access Key ID, Secret Access Key, region: us-east-1, output: json</span>
+aws sts get-caller-identity   <span class="cmt"># sanity check — shows your account/user</span>
+
+<span class="cmt"># --- Terraform ---</span>
+winget install Hashicorp.Terraform
+<span class="cmt"># restart your terminal, then:</span>
+terraform version</code></pre>
+  <div class="callout warn">
+    <strong>Warning: restart your terminal after each install</strong>
+    Newly installed programs aren't on your PATH until you open a fresh PowerShell window. If <code>aws</code> or <code>terraform</code> says "not recognized", that's why.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="workflow"><span class="hnum">4</span> The Terraform workflow</h2>
+<p class="h-sub">Every Terraform session follows this cycle. Memorize it — it's the same at every job.</p>
+
+<div class="card">
+<figure>
+<svg viewBox="0 0 840 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Terraform workflow: write, init, plan, apply, verify, destroy">
+  <defs>
+    <marker id="warrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b46c1"/>
+    </marker>
+  </defs>
+  <!-- boxes -->
+  <g font-family="Segoe UI, sans-serif">
+    <rect x="15"  y="55" width="115" height="80" rx="10" fill="#ede9fe" stroke="#6b46c1" stroke-width="1.6"/>
+    <text x="72" y="85" text-anchor="middle" font-size="20">✍️</text>
+    <text x="72" y="107" text-anchor="middle" font-size="12" font-weight="700" fill="#1a2332">Write .tf files</text>
+    <text x="72" y="122" text-anchor="middle" font-size="10" fill="#5b6b7f">(done for you!)</text>
+
+    <rect x="155" y="55" width="115" height="80" rx="10" fill="#fff" stroke="#6b46c1" stroke-width="1.6"/>
+    <text x="212" y="85" text-anchor="middle" font-size="20">📦</text>
+    <text x="212" y="107" text-anchor="middle" font-size="12" font-weight="700" fill="#1a2332">terraform init</text>
+    <text x="212" y="122" text-anchor="middle" font-size="10" fill="#5b6b7f">download providers</text>
+
+    <rect x="295" y="55" width="115" height="80" rx="10" fill="#fff" stroke="#6b46c1" stroke-width="1.6"/>
+    <text x="352" y="85" text-anchor="middle" font-size="20">🔍</text>
+    <text x="352" y="107" text-anchor="middle" font-size="12" font-weight="700" fill="#1a2332">terraform plan</text>
+    <text x="352" y="122" text-anchor="middle" font-size="10" fill="#5b6b7f">dry run — READ IT</text>
+
+    <rect x="435" y="55" width="115" height="80" rx="10" fill="#e8f5ec" stroke="#15803d" stroke-width="1.6"/>
+    <text x="492" y="85" text-anchor="middle" font-size="20">🚀</text>
+    <text x="492" y="107" text-anchor="middle" font-size="12" font-weight="700" fill="#1a2332">terraform apply</text>
+    <text x="492" y="122" text-anchor="middle" font-size="10" fill="#5b6b7f">builds for real</text>
+
+    <rect x="575" y="55" width="115" height="80" rx="10" fill="#fff" stroke="#15803d" stroke-width="1.6"/>
+    <text x="632" y="85" text-anchor="middle" font-size="20">✅</text>
+    <text x="632" y="107" text-anchor="middle" font-size="12" font-weight="700" fill="#1a2332">Verify</text>
+    <text x="632" y="122" text-anchor="middle" font-size="10" fill="#5b6b7f">website + console</text>
+
+    <rect x="715" y="55" width="115" height="80" rx="10" fill="#fdecec" stroke="#b91c1c" stroke-width="1.6"/>
+    <text x="772" y="85" text-anchor="middle" font-size="20">🧹</text>
+    <text x="772" y="107" text-anchor="middle" font-size="12" font-weight="700" fill="#1a2332">terraform destroy</text>
+    <text x="772" y="122" text-anchor="middle" font-size="10" fill="#5b6b7f">every session!</text>
+  </g>
+  <!-- arrows -->
+  <line x1="130" y1="95" x2="153" y2="95" stroke="#6b46c1" stroke-width="2" marker-end="url(#warrow)"/>
+  <line x1="270" y1="95" x2="293" y2="95" stroke="#6b46c1" stroke-width="2" marker-end="url(#warrow)"/>
+  <line x1="410" y1="95" x2="433" y2="95" stroke="#6b46c1" stroke-width="2" marker-end="url(#warrow)"/>
+  <line x1="550" y1="95" x2="573" y2="95" stroke="#6b46c1" stroke-width="2" marker-end="url(#warrow)"/>
+  <line x1="690" y1="95" x2="713" y2="95" stroke="#6b46c1" stroke-width="2" marker-end="url(#warrow)"/>
+  <!-- loop back -->
+  <path d="M 772 137 Q 772 185 420 185 Q 72 185 72 139" fill="none" stroke="#6b46c1" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#warrow)"/>
+  <text x="420" y="177" text-anchor="middle" font-size="11" fill="#6b46c1">rebuild any time — that's the whole point of IaC 🔁</text>
+</svg>
+<figcaption>The core loop. <code>plan</code> is the dry run (nothing changes); <code>apply</code> builds; <code>destroy</code> tears it all down. Between init and plan, run <code>terraform fmt</code> and <code>terraform validate</code> as good habits.</figcaption>
+</figure>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="build"><span class="hnum">5</span> Build it, step by step</h2>
+<p class="h-sub">All commands run in PowerShell <strong>from the project folder</strong>. Start every session with:</p>
+
+<div class="card">
+<pre><code>cd Project-IaC</code></pre>
+</div>
+
+<div class="card step">
+  <div class="snum">5.1</div>
+  <div class="sbody">
+    <h3>Create your personal variables file</h3>
+    <p>Copy the template, then edit it with your own values:</p>
+<pre><code>Copy-Item terraform.tfvars.example terraform.tfvars
+notepad terraform.tfvars</code></pre>
+    <p>Set <code>ssh_allowed_cidr</code> to <strong>your public IP + <code>/32</code></strong> (from <a href="https://checkip.amazonaws.com">checkip.amazonaws.com</a>), e.g. <code>"198.51.100.7/32"</code>. Leave everything else as-is for now.</p>
+    <div class="callout info">
+      <strong>Note: why /32?</strong>
+      A <code>/32</code> means "exactly this one IP address" — so only <em>your</em> computer can even attempt SSH. The project refuses <code>0.0.0.0/0</code> (the whole internet) on purpose. This file is git-ignored because it's personal to you.
+    </div>
+  </div>
+</div>
+
+<div class="card step">
+  <div class="snum">5.2</div>
+  <div class="sbody">
+    <h3>Initialize the project</h3>
+    <p>Downloads the AWS and random providers into <code>.terraform/</code>. Run once per project (again only if provider versions change):</p>
+<pre><code>terraform init</code></pre>
+    <p>Success looks like: <span style="color:var(--ok)"><strong>"Terraform has been successfully initialized!"</strong></span></p>
+  </div>
+</div>
+
+<div class="card step">
+  <div class="snum">5.3</div>
+  <div class="sbody">
+    <h3>Format and validate</h3>
+    <p>Good habits from day one — format the code, then catch errors <em>before</em> touching AWS:</p>
+<pre><code>terraform fmt        <span class="cmt"># auto-formats .tf files to canonical style</span>
+terraform validate   <span class="cmt"># catches syntax/reference errors</span></code></pre>
+  </div>
+</div>
+
+<div class="card step">
+  <div class="snum">5.4</div>
+  <div class="sbody">
+    <h3>Plan — the dry run</h3>
+    <p>Terraform shows exactly what it <em>would</em> create. Nothing is built yet.</p>
+<pre><code>terraform plan</code></pre>
+    <p>Look for this at the end: <code class="hl">Plan: 13 to add, 0 to change, 0 to destroy.</code></p>
+    <div class="callout tip">
+      <strong>Tip: always read the plan.</strong>
+      This habit will save you at work. The plan is Terraform telling you its intentions — <code>+</code> means create, <code>~</code> means change, <code>-</code> means destroy. Never apply a plan you haven't read.
+    </div>
+  </div>
+</div>
+
+<div class="card step">
+  <div class="snum">5.5</div>
+  <div class="sbody">
+    <h3>Apply — build it for real</h3>
+<pre><code>terraform apply</code></pre>
+    <p>Terraform shows the plan again and asks for confirmation — type <code>yes</code>. After 2–3 minutes you'll see the <strong>outputs</strong>:</p>
+<pre><code>Outputs:
+
+bucket_name        = "tf-learning-bucket-a1b2c3d4"
+instance_public_ip = "3.85.x.x"
+website_url        = "http://3.85.x.x"
+ssh_command        = "ssh -i tf-learning-key.pem ec2-user@3.85.x.x"</code></pre>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="verify"><span class="hnum">6</span> Verify it worked</h2>
+<p class="h-sub">Three ways to prove your infrastructure is real.</p>
+
+<div class="card">
+  <ol style="margin:0; padding-left:20px;">
+    <li style="margin-bottom:12px;"><strong>Open the website</strong> — copy the <code>website_url</code> output into your browser. You should see <em>"Hello from Terraform!"</em>. Give it a minute or two after apply — the boot script needs time to install nginx.
+      <img src="screenshots/hello-from-terraform.png" alt="Browser showing the deployed nginx page with the message Hello from Terraform" style="max-width:100%; border-radius:10px; border:1px solid var(--line); margin-top:10px; display:block;">
+    </li>
+    <li style="margin-bottom:12px;"><strong>Check the AWS console</strong> — EC2 → Instances (region: <strong>us-east-1</strong>): you'll see <code>tf-learning-web</code> running. Also peek at VPC → Your VPCs and S3 → Buckets. Everything is tagged <code>Project = terraform-learning</code>.
+      <img src="screenshots/AWS-instance.png" alt="AWS EC2 console showing the tf-learning-web instance in the running state" style="max-width:100%; border-radius:10px; border:1px solid var(--line); margin-top:10px; display:block;">
+    </li>
+    <li><strong>Re-print outputs anytime</strong>: <code>terraform output</code></li>
+  </ol>
+  <div class="callout warn">
+    <strong>Warning: it's http://, not https://</strong>
+    Browsers sometimes silently force <code>https://</code> and show a connection error. Check the address bar — this simple server only speaks plain HTTP on port 80.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="troubleshooting"><span class="hnum">7</span> Troubleshooting &amp; lessons learned</h2>
+<p class="h-sub">Real errors hit during this build, with the root cause and the fix — a reference for when things don't go to plan.</p>
+
+<div class="card">
+  <table>
+    <tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr>
+    <tr>
+      <td><code>InvalidParameterCombination</code>: instance type not eligible for Free Tier</td>
+      <td>Free-tier eligible instance types differ by account and region and change over time. Older guides assume <code>t2.micro</code>, but many accounts today only get <code>t3.micro</code> or <code>t4g.micro</code>.</td>
+      <td>Query what's actually eligible before setting <code>instance_type</code>:<br><code>aws ec2 describe-instance-types --region &lt;region&gt; --filters "Name=free-tier-eligible,Values=true" --query "InstanceTypes[].InstanceType" --output table</code></td>
+    </tr>
+    <tr>
+      <td><code>terraform plan -out</code> errors with "flag needs an argument" or "is a directory"</td>
+      <td><code>-out</code> requires a filename, not a bare flag or a directory path.</td>
+      <td>Give it a name explicitly: <code>terraform plan -out=tfplan</code>, then apply exactly that plan with <code>terraform apply tfplan</code>.</td>
+    </tr>
+    <tr>
+      <td>PowerShell says "term not recognized" for something that looks like a resource name or tag value</td>
+      <td>Text describing what a config file should <em>contain</em> (e.g. <code>key_pair_name = "my-key"</code>) is not a shell command — it's an instruction to edit a file, and PowerShell tries to run it literally.</td>
+      <td>Open the file in a text editor and make the edit there: <code>notepad terraform.tfvars</code>. Don't type config syntax at the prompt.</td>
+    </tr>
+    <tr>
+      <td>Saved <code>.pem</code> private key file is 0 bytes, and AWS reports <code>InvalidKeyPair.Duplicate</code> on retry</td>
+      <td><code>aws ec2 create-key-pair ... | Out-File keyname.pem</code> truncates the file on every run — including failed or repeated runs. Running the create command a second time hits <code>InvalidKeyPair.Duplicate</code> and silently wipes the previously saved key. AWS never lets you retrieve a private key after creation, so the key pair becomes unusable at that point.</td>
+      <td>Run the create command exactly once. To redo it, explicitly delete the old key pair first (<code>aws ec2 delete-key-pair --key-name ...</code>), remove the old <code>.pem</code>, then create fresh. Never re-run <code>create-key-pair</code> "just in case."</td>
+    </tr>
+    <tr>
+      <td>SSH connection times out to an IP that worked a moment ago</td>
+      <td>Changing <code>key_pair_name</code> (or various other instance attributes) forces Terraform to destroy and recreate the EC2 instance, which gets a brand-new public IP. A browser tab can also appear to still "work" from cache even though the server behind that IP no longer exists.</td>
+      <td>After any apply that replaces the instance, re-check <code>terraform output</code> for the current IP instead of reusing one from a previous session. Hard-refresh any browser tab pointed at the old IP.</td>
+    </tr>
+    <tr>
+      <td>Commands fail inside an SSH session on the instance — <code>terraform</code> or a familiar command "not found," or <code>cp</code> failing against an <code>s3://</code> path</td>
+      <td>SSH drops you into a separate Linux environment on the remote server, which has none of your local machine's tools. Terraform isn't installed there, and never needs to be — the whole point of the exercise is that the server only has the AWS CLI and its IAM role.</td>
+      <td>Run Terraform commands (<code>terraform output</code>, <code>terraform destroy</code>, etc.) back on your own machine — <code>exit</code> the SSH session first. To copy files to/from S3, use <code>aws s3 cp</code>, not the plain <code>cp</code> command — S3 isn't a real filesystem path.</td>
+    </tr>
+    <tr>
+      <td>A command fails when placeholder text like <code>&lt;your-bucket-name&gt;</code> or <code>&lt;instance_public_ip&gt;</code> is copied in literally</td>
+      <td>Angle brackets in a guide mark a placeholder to be replaced with your actual value, not literal text to type.</td>
+      <td>Substitute the real value — shown in <code>terraform output</code> or on the deployed page — before running the command.</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ssh"><span class="hnum">8</span> Optional: SSH in &amp; see IAM least-privilege in action</h2>
+<p class="h-sub">The best lesson in this project: the server can use S3 with <strong>no stored credentials at all</strong>.</p>
+
+<div class="card step">
+  <div class="snum">7.1</div>
+  <div class="sbody">
+    <h3>Create a key pair (PowerShell)</h3>
+<pre><code>aws ec2 create-key-pair --key-name tf-learning-key --query 'KeyMaterial' --output text | Out-File -Encoding ascii tf-learning-key.pem</code></pre>
+    <p>Then in <code>terraform.tfvars</code>, uncomment and set:</p>
+<pre><code>key_pair_name = "tf-learning-key"</code></pre>
+    <p>Run <code>terraform apply</code> again.</p>
+    <div class="callout warn">
+      <strong>Warning: the instance will be REPLACED</strong>
+      Adding a key to an existing instance forces destroy + recreate (you get a new IP). The plan will say so — that's normal. Read it, confirm with <code>yes</code>.
+    </div>
+  </div>
+</div>
+
+<div class="card step">
+  <div class="snum">7.2</div>
+  <div class="sbody">
+    <h3>SSH in</h3>
+    <p>Windows 10/11 includes OpenSSH — no extra install needed:</p>
+<pre><code>ssh -i tf-learning-key.pem ec2-user@&lt;instance_public_ip&gt;</code></pre>
+  </div>
+</div>
+
+<div class="card step">
+  <div class="snum">7.3</div>
+  <div class="sbody">
+    <h3>Test S3 access from the instance (you're now in a Linux shell)</h3>
+    <p>The bucket name is shown on the hello page, or run <code>terraform output bucket_name</code> on your PC.</p>
+<pre><code>echo "hello from the instance role" &gt; test.txt
+aws s3 cp test.txt s3://&lt;your-bucket-name&gt;/test.txt   <span class="hl"># works: role allows PutObject</span>
+aws s3 cp s3://&lt;your-bucket-name&gt;/test.txt back.txt   <span class="hl"># works: role allows GetObject</span>
+aws s3 ls s3://&lt;your-bucket-name&gt;/                    <span class="hl"># works: role allows ListBucket</span>
+aws s3 ls                                             <span class="cmt"># FAILS: listing ALL buckets is not granted</span></code></pre>
+    <div class="callout tip">
+      <strong>Tip: that last failure is the whole point — least privilege.</strong>
+      The role can touch this one bucket and nothing else. No access keys exist on the instance — run <code>aws sts get-caller-identity</code> there and you'll see it's using the role. This "no credentials on servers" pattern is a top interview topic.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="destroy"><span class="hnum">9</span> Destroy when you're done — every session</h2>
+<p class="h-sub">The single most important habit in this whole guide.</p>
+
+<div class="card">
+<pre><code>terraform destroy   <span class="cmt"># shows what will be deleted, asks for "yes"</span></code></pre>
+  <div class="callout danger">
+    <strong>Important: every session ends with destroy.</strong>
+    <ul style="margin:8px 0 0; padding-left:18px;">
+      <li>Free Tier covers 750 hours/month of an eligible micro instance type (e.g. t3.micro) for the first 12 months — but only on eligible accounts, and it expires. A forgotten micro instance after that is roughly <strong>£6–7/month (approx.)</strong>.</li>
+      <li>Rebuilding is one <code>terraform apply</code> away — that's the whole point of IaC. Destroying costs you nothing but a coffee break.</li>
+      <li>You did set up that budget alert in section 3, right?</li>
+    </ul>
+  </div>
+  <p>If you created the SSH key pair, it lives <em>outside</em> Terraform — delete it separately when you're fully done:</p>
+<pre><code>aws ec2 delete-key-pair --key-name tf-learning-key
+Remove-Item tf-learning-key.pem</code></pre>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="files"><span class="hnum">10</span> What each file does</h2>
+<p class="h-sub">Open them in this order — each one is heavily commented as teaching material.</p>
+
+<div class="card">
+  <div class="tablewrap">
+  <table>
+    <tr><th>File</th><th>Contents</th></tr>
+    <tr><td><code>versions.tf</code></td><td>Required Terraform + provider versions (pinned for reproducibility)</td></tr>
+    <tr><td><code>providers.tf</code></td><td>AWS provider config: region + default tags applied to everything</td></tr>
+    <tr><td><code>variables.tf</code></td><td>Input variables with descriptions, defaults, and validation rules</td></tr>
+    <tr><td><code>network.tf</code></td><td>VPC, subnet, internet gateway, route table, security group</td></tr>
+    <tr><td><code>compute.tf</code></td><td>AMI lookup (data source) + the EC2 instance</td></tr>
+    <tr><td><code>user_data.sh.tpl</code></td><td>Boot script template: installs nginx, writes the hello page</td></tr>
+    <tr><td><code>iam.tf</code></td><td>IAM role, least-privilege S3 policy, instance profile</td></tr>
+    <tr><td><code>storage.tf</code></td><td>Private S3 bucket with random name suffix + public access block</td></tr>
+    <tr><td><code>outputs.tf</code></td><td>Values printed after apply (IP, URL, bucket, SSH command)</td></tr>
+    <tr><td><code>terraform.tfvars.example</code></td><td>Template for your personal values — copy to <code>terraform.tfvars</code></td></tr>
+    <tr><td><code>.gitignore</code></td><td>Keeps state files, <code>.terraform/</code>, tfvars, and keys out of git</td></tr>
+  </table>
+  </div>
+  <div class="callout info">
+    <strong>Note: files Terraform creates for itself</strong>
+    <code>terraform.tfstate</code> — Terraform's record of what it built. Treat it as <strong>sensitive</strong>, never edit by hand. <code>.terraform/</code> — downloaded providers. <code>.terraform.lock.hcl</code> — exact provider versions (this one <em>should</em> be committed to git).
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="next"><span class="hnum">11</span> What to learn next</h2>
+<p class="h-sub">Once the build → verify → destroy loop feels comfortable, level up in this order.</p>
+
+<div class="card">
+  <div class="tablewrap">
+  <table>
+    <tr><th>Topic</th><th>Why it matters</th></tr>
+    <tr><td><strong>Remote state</strong></td><td>Store <code>terraform.tfstate</code> in S3 with locking instead of on your laptop — required for teams. The natural "v2" of this project.</td></tr>
+    <tr><td><strong>Modules</strong></td><td>Package this VPC+EC2 pattern into a reusable module. Browse the Terraform Registry (e.g. <code>terraform-aws-modules/vpc/aws</code>).</td></tr>
+    <tr><td><strong>Workspaces / environments</strong></td><td>Run dev and prod copies of the same code (workspaces, directory-per-env, or Terragrunt).</td></tr>
+    <tr><td><strong>SSM Session Manager</strong></td><td>Shell access with <em>no SSH port and no key pairs</em> — attach <code>AmazonSSMManagedInstanceCore</code> to the role and delete the port-22 rule. The modern production way.</td></tr>
+    <tr><td><strong>Linters/scanners</strong></td><td><code>tflint</code>, <code>checkov</code>, <code>tfsec</code> — catch mistakes and security issues automatically.</td></tr>
+    <tr><td><strong>Command habits</strong></td><td><code>terraform plan -out=tfplan</code> then <code>terraform apply tfplan</code> — apply <em>exactly</em> what you reviewed.</td></tr>
+    <tr><td><strong>A second provider: Cloudflare</strong></td><td>Same Terraform skills, zero cost, instant applies — and everything you build (DNS, email aliases, security settings) is personally useful. See the <code>Project-Cloudflare/README.md</code> project for the 8-rung learning ladder. Managing two providers is also the moment IaC "clicks" as a transferable skill.</td></tr>
+  </table>
+  </div>
+</div>
+
+<footer>
+  Terraform + AWS Learning Project · Project-IaC ·
+  To save as PDF: press <strong>Ctrl+P</strong> in your browser → destination "Save as PDF"
+</footer>
+
+</div>
+</body>
+</html>

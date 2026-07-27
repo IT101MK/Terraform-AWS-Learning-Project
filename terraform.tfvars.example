@@ -1,0 +1,21 @@
+# terraform.tfvars.example
+#
+# HOW TO USE THIS FILE (PowerShell):
+#   Copy-Item terraform.tfvars.example terraform.tfvars
+# ...then edit terraform.tfvars with YOUR values. Terraform automatically
+# loads terraform.tfvars. It is git-ignored (see .gitignore) because it
+# contains values personal to you, like your home IP.
+
+# REQUIRED - replace with YOUR public IP + "/32".
+# Find it here: https://checkip.amazonaws.com
+ssh_allowed_cidr = "203.0.113.25/32" # <-- CHANGE ME
+
+# OPTIONAL - name of an existing EC2 key pair, if you want SSH access.
+# See README "Optional: SSH access" for how to create one. Delete the
+# leading "#" to enable.
+# key_pair_name = "tf-learning-key"
+
+# OPTIONAL - these already have sensible defaults in variables.tf.
+# aws_region    = "us-east-1"
+# instance_type = "t3.micro"
+# project_name  = "tf-learning"
