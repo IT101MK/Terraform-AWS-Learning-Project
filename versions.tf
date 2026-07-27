@@ -6,8 +6,9 @@
 # way next month as it does today, even if newer provider versions come out.
 
 terraform {
-  # Require a reasonably modern Terraform CLI.
-  required_version = ">= 1.5.0"
+  # Require a reasonably modern Terraform CLI, but stay below the next major
+  # version so a future Terraform 2.0 doesn't silently break this project.
+  required_version = ">= 1.5.0, < 2.0.0"
 
   required_providers {
     # The AWS provider is the plugin that knows how to create AWS resources

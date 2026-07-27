@@ -152,7 +152,7 @@
 
 <div class="callout danger">
   <strong>&#9888; This creates real, billable AWS resources.</strong>
-  Running <code>terraform apply</code> builds an actual EC2 instance, VPC, and S3 bucket in <strong>your own AWS account</strong> &mdash; this guide and its author have no visibility into, or control over, your account or your bill. Free Tier accounts typically pay £0 if destroyed promptly, but eligibility, limits, and pricing vary by account, region, and time. <strong>You are solely responsible for monitoring your AWS costs and destroying resources you don't need</strong> (see <a href="#destroy">Destroy when done</a>). Provided as-is under the <a href="https://github.com/IT101MK/Terraform-AWS-Learning-Project/blob/master/LICENSE.md">MIT licence</a> &mdash; no warranty, and no liability for any AWS charges you incur. Set up a billing alert before you run <code>terraform apply</code>.
+  Running <code>terraform apply</code> builds an actual EC2 instance, VPC, and S3 bucket in <strong>your own AWS account</strong> &mdash; this guide and its author have no visibility into, or control over, your account or your bill. Whether that costs £0 depends entirely on your account's current AWS free-usage terms &mdash; check <a href="https://aws.amazon.com/free">aws.amazon.com/free</a>, don't assume, as these terms change over time (they changed in 2025). <strong>You are solely responsible for monitoring your AWS costs and destroying resources you don't need</strong> (see <a href="#destroy">Destroy when done</a>). Provided as-is under the <a href="https://github.com/IT101MK/Terraform-AWS-Learning-Project/blob/main/LICENSE.md">MIT licence</a> &mdash; no warranty, and no liability for any AWS charges you incur. Set up a billing alert before you run <code>terraform apply</code>.
 </div>
 
 <nav class="card">
@@ -193,8 +193,8 @@
   </div>
 
   <div class="callout tip">
-    <strong>Tip: cost is £0 if you stay in the Free Tier and destroy when done.</strong>
-    t3.micro is free for 750 hrs/month during your account's first 12 months. There is deliberately <em>no NAT Gateway or load balancer</em> in this project — those are the classic "surprise bill" traps for learners.
+    <strong>Tip: this can cost £0, depending on your account's current free-usage terms.</strong>
+    AWS's free-usage offer has changed before and will change again — check <a href="https://aws.amazon.com/free">aws.amazon.com/free</a> for what applies to your account, don't assume a duration or hours figure. There is deliberately <em>no NAT Gateway or load balancer</em> in this project — those are the classic "surprise bill" traps for learners.
   </div>
   <div class="callout info">
     <strong>Note: free-tier eligible instance types vary by account and region.</strong>
@@ -375,10 +375,12 @@ terraform version</code></pre>
 
 <!-- ============================================================ -->
 <h2 id="build"><span class="hnum">5</span> Build it, step by step</h2>
-<p class="h-sub">All commands run in PowerShell <strong>from the project folder</strong>. Start every session with:</p>
+<p class="h-sub">All commands run in PowerShell <strong>from the project folder</strong>.</p>
 
 <div class="card">
-<pre><code>cd Project-IaC</code></pre>
+  <p><strong>Get the code first</strong>, if you haven't already: clone it with git, or if you don't have git, click the green <strong>Code</strong> button on the GitHub repo page &rarr; <strong>Download ZIP</strong> &rarr; extract it. Either way, open PowerShell in the resulting folder and start every session with:</p>
+<pre><code>git clone https://github.com/IT101MK/Terraform-AWS-Learning-Project.git
+cd Terraform-AWS-Learning-Project</code></pre>
 </div>
 
 <div class="card step">
@@ -508,6 +510,11 @@ ssh_command        = "No key pair configured - set key_pair_name in terraform.tf
       <td>Angle brackets in a guide mark a placeholder to be replaced with your actual value, not literal text to type.</td>
       <td>Substitute the real value — shown in <code>terraform output</code> or on the deployed page — before running the command.</td>
     </tr>
+    <tr>
+      <td><code>terraform apply</code> fails, hangs, or the EC2 instance is rejected on a <strong>brand-new</strong> AWS account</td>
+      <td>New AWS accounts sometimes get a temporary verification hold that blocks EC2 (and other services) for a few hours after signup.</td>
+      <td>Check the AWS console/email for an account verification banner, then wait and retry later.</td>
+    </tr>
   </table>
 </div>
 
@@ -565,7 +572,7 @@ aws s3 ls                                             <span class="cmt"># FAILS:
   <div class="callout danger">
     <strong>Important: every session ends with destroy.</strong>
     <ul style="margin:8px 0 0; padding-left:18px;">
-      <li>Free Tier covers 750 hours/month of an eligible micro instance type (e.g. t3.micro) for the first 12 months — but only on eligible accounts, and it expires. A forgotten micro instance after that is roughly <strong>£6–7/month (approx.)</strong>.</li>
+      <li>Whatever free-usage allowance your account has (hours, credit, or none — check <a href="https://aws.amazon.com/free">aws.amazon.com/free</a> for your account's actual terms) <strong>runs out or expires</strong>. A forgotten micro instance after that is roughly <strong>£6–7/month (approx.)</strong>.</li>
       <li>Rebuilding is one <code>terraform apply</code> away — that's the whole point of IaC. Destroying costs you nothing but a coffee break.</li>
       <li>You did set up that budget alert in section 3, right?</li>
       <li><strong>This is your AWS bill, your responsibility</strong> — only you can stop charges accruing on your account.</li>

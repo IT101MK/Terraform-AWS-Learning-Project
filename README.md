@@ -19,14 +19,15 @@ commercially. Provided as-is, without warranty.
 > Running `terraform apply` creates an actual EC2 instance, VPC, and S3
 > bucket in **your own AWS account**. AWS bills **you** for whatever you
 > leave running — this project and its author have no visibility into, or
-> control over, your account or your bill. Typical Free Tier accounts pay
-> £0 if destroyed promptly, but:
+> control over, your account or your bill. Whether that's £0 depends
+> entirely on your account's current free-usage terms — check
+> <https://aws.amazon.com/free>, don't assume:
 >
 > - **You are solely responsible for monitoring your AWS costs and
 >   destroying resources you don't need** (see [Destroy when you're
 >   done](#important-destroy-when-youre-done)).
-> - Free Tier eligibility, limits, and pricing vary by account, region, and
->   time, and are entirely outside this project's control.
+> - AWS's free-usage terms, eligibility, and limits change over time (they
+>   changed in 2025) and are entirely outside this project's control.
 > - Leaving resources running, misconfiguring `instance_type`, or exceeding
 >   Free Tier limits can and will incur real charges from AWS.
 >
@@ -56,9 +57,16 @@ destroy everything and rebuild it identically in minutes.
 | IAM role + instance profile | Lets the server access ONE S3 bucket, no keys stored anywhere |
 | Private S3 bucket | Storage the server can read/write (random name suffix) |
 
-Estimated cost: **£0 if your account is within the AWS Free Tier** (a free-tier
-eligible instance type, low S3 usage) and you destroy it when done. See the
-cost section below — please read it.
+Estimated cost: **potentially £0** if your account qualifies for AWS's current
+free-usage offer (a free-tier eligible instance type, low S3 usage) and you
+destroy it when done. See the cost section below — please read it.
+
+> **AWS's free-usage terms change over time and depend on your account.**
+> AWS has changed its Free Tier structure before (most recently in 2025, for
+> accounts created after 15 July 2025) and will likely do so again. Don't
+> take any duration, hours, or "free" claim in this guide as current fact —
+> check **<https://aws.amazon.com/free>** for what actually applies to
+> *your* account before assuming anything is free.
 
 > **Note:** free-tier eligible instance types vary by account and region and
 > change over time. Don't assume `t2.micro` — many accounts today are only
@@ -93,10 +101,16 @@ cost section below — please read it.
 
 ## First run, step by step
 
-All commands run in PowerShell **from this folder**:
+All commands run in PowerShell.
+
+**0. Get the code** — clone it with git, or if you don't have git/don't know
+what that means, click the green **Code** button on the GitHub repo page →
+**Download ZIP** → extract it. Either way, open a PowerShell terminal in the
+resulting folder:
 
 ```powershell
-cd Project-IaC
+git clone https://github.com/IT101MK/Terraform-AWS-Learning-Project.git
+cd Terraform-AWS-Learning-Project
 ```
 
 **1. Create your personal variables file**
@@ -173,6 +187,7 @@ in case you run into the same ones.
 | SSH times out on an IP that worked a minute ago | Changing `key_pair_name` (or other attributes) forces Terraform to destroy + recreate the instance, which gets a new public IP; old browser tabs can also show cached content from a server that no longer exists | Re-check `terraform output` for the current IP after any apply that replaces the instance; hard-refresh stale browser tabs |
 | Commands fail inside the SSH session on the instance — `terraform: command not found`, or plain `cp` fails against an `s3://` path | SSH drops you into a separate Linux environment with none of your local machine's tools — Terraform isn't installed there and doesn't need to be | Run Terraform commands on your own PC, not inside the SSH session (`exit` first); use `aws s3 cp` instead of `cp` for S3 paths |
 | A command with `<angle-bracket-placeholder>` fails literally | Angle brackets mark a placeholder to substitute, not literal text | Replace with the real value from `terraform output` or the deployed page before running |
+| `apply` fails or hangs on a **brand-new** AWS account, or EC2 launch is rejected | New accounts sometimes get a temporary verification hold that blocks EC2/other services for a few hours | Wait and retry later; check the AWS console for any account verification banner/email first |
 
 ## Optional: SSH access + testing S3 from the instance
 
@@ -225,10 +240,10 @@ terraform destroy   # shows what will be deleted, asks for "yes"
 Build the habit now: **every session ends with destroy** unless you have a
 reason to keep things running. Why it matters:
 
-- Free Tier covers 750 hours/month of an eligible micro instance type for
-  the first 12 months — but only on eligible accounts, and it expires. A
-  forgotten instance after that is roughly **£6–7/month (approx.)**; larger leftovers
-  cost real money.
+- Whatever free-usage allowance your account has (hours, credit, or none at
+  all — check <https://aws.amazon.com/free> for your account's actual
+  terms), it **runs out or expires**. A forgotten micro instance after that
+  is roughly **£6–7/month (approx.)**; larger leftovers cost real money.
 - **Strongly recommended**: set up an AWS Budget alert (console: Billing →
   Budgets → Create budget → Zero spend budget or £4/month (approx.) with email alert).
   Five minutes of setup, permanent peace of mind.
