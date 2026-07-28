@@ -457,7 +457,7 @@ ssh_command        = "No key pair configured - set key_pair_name in terraform.tf
     <li style="margin-bottom:12px;"><strong>Open the website</strong> — copy the <code>website_url</code> output into your browser. You should see <em>"Hello from Terraform!"</em>. Give it a minute or two after apply — the boot script needs time to install nginx.
       <img src="screenshots/hello-from-terraform.png" alt="Browser showing the deployed nginx page with the message Hello from Terraform" style="max-width:100%; border-radius:10px; border:1px solid var(--line); margin-top:10px; display:block;">
     </li>
-    <li style="margin-bottom:12px;"><strong>Check the AWS console</strong> — EC2 → Instances (region: <strong>us-east-1</strong>): you'll see <code>tf-learning-web</code> running. Also peek at VPC → Your VPCs and S3 → Buckets. Everything is tagged <code>Project = terraform-learning</code>.
+    <li style="margin-bottom:12px;"><strong>Check the AWS console</strong> — EC2 → Instances: make sure the console's region selector (top right) matches your <code>aws_region</code> (default <strong>us-east-1</strong>), or you won't see anything. You'll see <code>tf-learning-web</code> running. Also peek at VPC → Your VPCs and S3 → Buckets. Everything is tagged <code>Project = terraform-learning</code>.
       <img src="screenshots/AWS-instance.png" alt="AWS EC2 console showing the tf-learning-web instance in the running state" style="max-width:100%; border-radius:10px; border:1px solid var(--line); margin-top:10px; display:block;">
     </li>
     <li><strong>Re-print outputs anytime</strong>: <code>terraform output</code></li>

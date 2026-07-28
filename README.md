@@ -165,9 +165,11 @@ URL, the bucket name, and an SSH command.
 
    ![Deployed nginx page showing Hello from Terraform](screenshots/hello-from-terraform.png)
 
-2. **Check the AWS console**: EC2 → Instances (region: us-east-1) — you'll
-   see `tf-learning-web` running. Also peek at VPC → Your VPCs and S3 →
-   Buckets. Everything is tagged `Project = terraform-learning`.
+2. **Check the AWS console**: EC2 → Instances — make sure the console's
+   region selector (top right) matches your `aws_region` (default
+   `us-east-1`), or you won't see anything. You'll see `tf-learning-web`
+   running. Also peek at VPC → Your VPCs and S3 → Buckets. Everything is
+   tagged `Project = terraform-learning`.
 
    ![AWS EC2 console showing the tf-learning-web instance running](screenshots/AWS-instance.png)
 
