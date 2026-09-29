@@ -286,6 +286,10 @@ by hand), `.terraform/` (downloaded providers), and `.terraform.lock.hcl`
 
 ## What to learn next
 
+> **Ready for the next step?** [`Terraform-AWS-Learning-Project-Advanced`](https://github.com/IT101MK/Terraform-AWS-Learning-Project-Advanced)
+> picks up where this project leaves off: remote S3 state, a reusable host module, a multi-host fleet,
+> SSM Session Manager (no SSH keys), Ansible configuration management, and CloudWatch monitoring.
+
 - **Remote state**: store `terraform.tfstate` in an S3 bucket with locking
   instead of on your laptop — required for teams, and "v2" of this project.
 - **Modules**: package this VPC+EC2 pattern into a reusable module and call
