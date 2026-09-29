@@ -20,7 +20,7 @@ commercially. Provided as-is, without warranty.
 > bucket in **your own AWS account**. AWS bills **you** for whatever you
 > leave running — this project and its author have no visibility into, or
 > control over, your account or your bill. Whether that's £0 depends
-> entirely on your account's current free-usage terms — check
+> entirely on your account's current free-usage terms check
 > <https://aws.amazon.com/free>, don't assume:
 >
 > - **You are solely responsible for monitoring your AWS costs and
